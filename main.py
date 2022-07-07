@@ -84,3 +84,4 @@ def chose_random_move(board, moves_list):
         return random.choice(possible_moves)
     else:
         return None
+
