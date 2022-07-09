@@ -35,9 +35,9 @@ def who_starts_first():
         return 'Machine'
 
 
-def make_move(board, letter, move):
+def make_move(board, letter, m_move):
     """Make a move"""
-    board[move] = letter
+    board[m_move] = letter
 
 
 def is_winner(board, letter):
@@ -93,30 +93,31 @@ def chose_random_move(board, moves_list):
     for i in moves_list:
         if is_space_free(board, i):
             possible_moves.append(i)
+
     if len(possible_moves) != 0:
         return random.choice(possible_moves)
     else:
         return None
 
 
-def get_machine_move(board, machine_letter, player_letter):
+def get_machine_move(board, machine, player):  # !!!
     """computer moves"""
     for i in range(9):
         board_copy = get_copy_board(board)
         if is_space_free(board_copy, i):
-            make_move(board_copy, machine_letter, i)
-            if is_winner(board_copy, machine_letter):
+            make_move(board_copy, machine, i)
+            if is_winner(board_copy, machine):
                 return i
 
     for i in range(9):
         board_copy = get_copy_board(board)
         if is_space_free(board_copy, i):
-            make_move(board_copy, player_letter, i)
-            if is_winner(board_copy, player_letter):
+            make_move(board_copy, player, i)
+            if is_winner(board_copy, player):
                 return i
 
     """try claim corner"""
-    move = chose_random_move(board, [0, 2, 6, 8])
+    move = chose_random_move(board, [0, 2, 6, 8])  # !!!
     if move is not None:
         return move
 
@@ -125,12 +126,14 @@ def get_machine_move(board, machine_letter, player_letter):
         return 4
 
     """try make move by side"""
-    return chose_random_move(board, [1, 3, 5, 7])
+    if move == None:
+        return random.choice([1, 3, 5, 7])
+    # return chose_random_move(board, [1, 3, 5, 7])  # !!! err
 
 
 def is_board_full(board):
     """return True, if field full"""
-    for i in range(1, 10):
+    for i in range(9):  # !!!
         if is_space_free(board, i):
             return False
 
@@ -138,20 +141,25 @@ def is_board_full(board):
 if __name__ == '__main__':
     print('Game: "TicTacToe"')
 
-    game_is_playing = True
-    while game_is_playing:
+    global_game = True
+    while global_game:
         """restart game field"""
         the_board = [' '] * 9
         player_letter, machine_letter = input_player_letter()
         turn = who_starts_first()
         print(turn, 'start first.')
 
+        game_is_playing = True
         while game_is_playing:
             if turn == 'Human':
                 """players turn"""
                 draw_board(the_board)
                 player_move = get_player_move(the_board)
                 make_move(the_board, player_letter, player_move)
+
+                if is_board_full(the_board):
+                    print('Draw!')
+                    game_is_playing = False
 
                 if is_winner(the_board, player_letter):
                     draw_board(the_board)
@@ -184,3 +192,5 @@ if __name__ == '__main__':
         if not input('Play again? (yes or no) ').lower().startswith('y'):
             print('Bye!')
             game_is_playing = False
+    if not global_game:
+        global_game = False
